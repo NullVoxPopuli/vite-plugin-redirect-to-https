@@ -1,17 +1,9 @@
-import { createServer } from 'node:http';
+import { spawn } from 'node:child_process';
+import { join } from 'node:path';
 
-/**
- * @typedef {Object} RedirectOptions
- * @property {number} [httpPort] - The port for the HTTP redirect server (defaults to 80, or httpsPort - 363 if httpsPort is set)
- */
-
-/**
- * @param {RedirectOptions} [options]
- */
-export function redirectToHttps(options = {}) {
+export function redirectToHttps() {
   let activate = false;
-  let httpsPort = -1;
-  let httpServer = null;
+  let spawned;
 
   /**
   * @type {import('vite').Plugin}
@@ -28,40 +20,18 @@ export function redirectToHttps(options = {}) {
       viteServer.httpServer?.once('listening', () => {
         const address = viteServer.httpServer?.address();
         if (address && typeof address === 'object') {
-          httpsPort = address.port;
-          let httpPort = address.port;
+          let port = address.port;
 
-          // Create HTTP server that redirects to HTTPS
-          httpServer = createServer((req, res) => {
-            const host = req.headers.host?.split(':')[0] || 'localhost';
-            const httpsUrl = `https://${host}:${httpsPort}${req.url}`;
-            
-            res.writeHead(301, { 
-              Location: httpsUrl,
-              'Content-Type': 'text/plain'
-            });
-            res.end(`Redirecting to ${httpsUrl}`);
+          spawned = spawn('node', [join(import.meta.dirname, 'http.js'), `--port=${port}`]);
+
+
+          spawned.stdout.on('data', (data) => {
+            console.log(`stdout: ${data}`);
           });
 
-          httpServer.listen(httpPort, (err) => {
-            if (err) {
-              console.error(`Failed to start HTTP redirect server on port ${httpPort}:`, err.message);
-              if (err.code === 'EACCES') {
-                console.log(`Port ${httpPort} requires elevated privileges. Try: sudo setcap cap_net_bind_service=+ep $(which node)`);
-                console.log(`Or use a higher port like: redirectToHttps({ httpPort: 8080 })`);
-              }
-            } else {
-              console.log(`HTTP redirect server listening on http://localhost:${httpPort} -> https://localhost:${httpsPort}`);
-            }
+          spawned.stderr.on('data', (data) => {
+            console.error(`stderr: ${data}`);
           });
-        }
-      });
-
-      // Clean up the HTTP server when Vite server closes
-      viteServer.httpServer?.on('close', () => {
-        if (httpServer) {
-          httpServer.close();
-          httpServer = null;
         }
       });
     }
