@@ -1,0 +1,30 @@
+{
+  "name": "vite-plugin-dev-status",
+  "version": "0.0.0",
+  "description": "A customizable plugin that shows you dev status",
+  "type": "module",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "scripts": {
+    "dev": "vite",
+    "format": "prettier . --write"
+  },
+  "keywords": [
+    "vite",
+    "plugin",
+    "https",
+    "redirect"
+  ],
+  "author": "NullVoxPopuli",
+  "license": "MIT",
+  "packageManager": "pnpm@10.24.0",
+  "devDependencies": {
+    "@tsconfig/node-lts": "^24.0.0",
+    "@tsconfig/node-ts": "^23.6.2",
+    "@types/node": "^24.10.1",
+    "prettier": "^3.7.3",
+    "typescript": "^5.9.3",
+    "vite": "^7.2.6",
+    "vite-plugin-mkcert": "^1.17.9"
+  }
+}
