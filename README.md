@@ -1,5 +1,8 @@
 # vite-plugin-redirect-to-https
 
+> [!NOTE]
+> It's not possibl to implement this. in node, bun, etc. It's not possible to run two processes on the same port
+
 When using https with vite, either with [vite-plugin-mkcert](https://github.com/liuweiGL/vite-plugin-mkcert), you may accidentally find you (or your browser) navigating to http URLs accidental instead of https.
 
 _This plugin fixes that_.
